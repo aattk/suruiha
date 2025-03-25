@@ -18,5 +18,6 @@ colormap(parula);  % Doğal renkler
 shading interp;    % Yüzeyi yumuşak yap
 light;             % Işık kaynağı ekle
 lighting phong;    % Daha iyi ışık efektleri
+shading interp;
 end
 
