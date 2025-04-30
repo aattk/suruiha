@@ -1,17 +1,15 @@
 classdef pso3D
     properties
-        pNumber =  30;   % Parçacık Sayısı
+        pNumber =  60;  % Parçacık Sayısı
         w       = 0.7;  % Atalet katsayısı
         c1      = 1.5;  % Bireysel en iyi katsayı
         c2      = 1.5;  % Küresel en iyi katsayı
-        xStep   = 3;    % Ucak X Eksen Hareket Limiti   Parcacik Hiz Limiti
-        yStep   = 3;    % Ucak Y Eksen Hareket Limiti   Parcacik Hiz Limiti
-        zStep   = 1;    % Ucak Z Eksen Hareket Limiti Parcacik Hiz Limiti
-
+        xStep   = 2;    % Ucak X Eksen Hareket Limiti   Parcacik Hiz Limiti
+        yStep   = 2;    % Ucak Y Eksen Hareket Limiti   Parcacik Hiz Limiti
+        zStep   = 0.1;  % Ucak Z Eksen Hareket Limiti Parcacik Hiz Limiti
 
         startPos = [0, 0, 0];  % Başlangıç Konumu
         goalPos  = [0, 0, 0];  % Hedef Konumu
-
 
         MAP;              % Harita ve engel verisi
         pLocations;       % Parçacık Konumları
@@ -40,9 +38,9 @@ classdef pso3D
 
             % Parçacıkları başlat
             for i = 1:this.pNumber
-                this.pLocations(i).x = rand * this.xStep + this.startPos(1);
-                this.pLocations(i).y = rand * this.yStep + this.startPos(2);
-                this.pLocations(i).z = rand * this.zStep + this.startPos(3);
+                this.pLocations(i).x = rand() * this.xStep + this.startPos(1);
+                this.pLocations(i).y = rand() * this.yStep + this.startPos(2);
+                this.pLocations(i).z = rand() * this.zStep + this.startPos(3);
 
                 this.pSpeeds(i).x = 0;
                 this.pSpeeds(i).y = 0;
@@ -77,16 +75,15 @@ classdef pso3D
             this.pSpeeds(pNum).y = max(min(this.pSpeeds(pNum).y,this.yStep),-this.yStep);
             this.pSpeeds(pNum).z = max(min(this.pSpeeds(pNum).z,this.zStep),-this.zStep);
 
-
             % Konumları güncelle
             this.pLocations(pNum).x = this.pLocations(pNum).x + this.pSpeeds(pNum).x;
             this.pLocations(pNum).y = this.pLocations(pNum).y + this.pSpeeds(pNum).y;
             this.pLocations(pNum).z = this.pLocations(pNum).z + this.pSpeeds(pNum).z;
 
             % Sınırları aşan parçacıkları düzelt
-            this.pLocations(pNum).x = max(min(this.pLocations(pNum).x, this.MAP.X_MAX_LIMIT), this.MAP.X_MIN_LIMIT);
-            this.pLocations(pNum).y = max(min(this.pLocations(pNum).y, this.MAP.Y_MAX_LIMIT), this.MAP.Y_MIN_LIMIT);
-            this.pLocations(pNum).z = max(min(this.pLocations(pNum).z, this.MAP.Z_MAX_LIMIT), this.MAP.Z_MIN_LIMIT);
+            this.pLocations(pNum).x = max(min(this.pLocations(pNum).x, this.MAP.X_MAX_LIMIT - this.xStep), this.MAP.X_MIN_LIMIT + this.xStep);
+            this.pLocations(pNum).y = max(min(this.pLocations(pNum).y, this.MAP.Y_MAX_LIMIT - this.yStep), this.MAP.Y_MIN_LIMIT + this.xStep);
+            this.pLocations(pNum).z = max(min(this.pLocations(pNum).z, this.MAP.Z_MAX_LIMIT - this.zStep), this.MAP.Z_MIN_LIMIT + this.xStep);
 
         end
 

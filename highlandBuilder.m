@@ -1,4 +1,4 @@
-function [] = highlandBuilder(MAP, X_INDEX,X_WIDTH, Y_INDEX,Y_WIDTH, HEIGHT )
+function out = highlandBuilder(MAP, X_INDEX,X_WIDTH, Y_INDEX,Y_WIDTH, HEIGHT )
 % HIGHLANDBUILDER - @alpaslantetik
 %   3D plotta dag olusturmak icin kullanilir. 
 
@@ -8,7 +8,7 @@ function [] = highlandBuilder(MAP, X_INDEX,X_WIDTH, Y_INDEX,Y_WIDTH, HEIGHT )
 Z = exp(-( ( X - X_INDEX ) / X_WIDTH ).^2 - ( ( Y - Y_INDEX) / Y_WIDTH).^2 ) * HEIGHT + rand( size( X ) ) * 0.001;
 
 % Carpisma Tespiti Icin Yuzey Koplayama Islemi
-MAP.Z = MAP.Z + Z;
+out = MAP.Z + Z;
 
 
 % 3D Dağ Görselleştirme

@@ -8,7 +8,7 @@ MAP.X_MAX_LIMIT =  100;
 MAP.Y_MIN_LIMIT = -100;
 MAP.Y_MAX_LIMIT =  100;
 MAP.Z_MIN_LIMIT =    0;
-MAP.Z_MAX_LIMIT =   12;
+MAP.Z_MAX_LIMIT =   15;
 MAP.STEP        =    1;
 
 % System Variable - Sistem Degsikenleri 
@@ -24,28 +24,26 @@ axis tight;
 view(3);
 
 % 3D MAP BUILD
-highlandBuilder(MAP,MAP.X_MAX_LIMIT,0.01,MAP.Y_MAX_LIMIT,0.01,MAP.Z_MAX_LIMIT);
-highlandBuilder(MAP,2,2,2,3,4);
-highlandBuilder(MAP,4,6,8,3,3);
-highlandBuilder(MAP,1,10,12,2,2);
-highlandBuilder(MAP,-15,10,-10,2,5);
-radarBuilder(MAP,-5,3,0,10);
-radarBuilder(MAP,15,3,0,10);
+MAP.Z = highlandBuilder(MAP,MAP.X_MAX_LIMIT,0.01,MAP.Y_MAX_LIMIT,0.01,MAP.Z_MAX_LIMIT);
+MAP.Z = highlandBuilder(MAP,16,20,2,3,12);
+MAP.Z = highlandBuilder(MAP,-30,20,-20,30,8);
+MAP.Z = highlandBuilder(MAP,60,10,60,4,10);
+MAP.Z = highlandBuilder(MAP,80,10,-60,2,5);
+% MAP.Z = radarBuilder(MAP,-5,3,0,10);
+% MAP.Z = radarBuilder(MAP,-60,60,0,10);
 
 
 %% OTHER
 N = 100; % Gösterilecek geçmiş adım sayısı
-pathX = [-50]; % Başlangıç X koordinatını diziye ekle
-pathY = [-50]; % Başlangıç Y koordinatını diziye ekle
+pathX = [-95]; % Başlangıç X koordinatını diziye ekle
+pathY = [-95]; % Başlangıç Y koordinatını diziye ekle
 pathZ = [0];   % Başlangıç Z koordinatını diziye ekle
 
 
 plot3(42, 33, 4, 'ro', 'MarkerSize',3, 'MarkerFaceColor', 'r');
-hPoint = plot3(-50, -50, 0, 'ro', 'MarkerSize', 3, 'MarkerFaceColor', 'g');
+hPoint = plot3(-95, -95, 0, 'ro', 'MarkerSize', 3, 'MarkerFaceColor', 'g');
 
-p = pso3D(MAP,[-50,-50,0],[42,33,4]);  
-p = p.calculatePosition();
-
+p = pso3D(MAP,[-95,-95,0],[42,33,4]);  
 while true 
     p = p.calculatePosition(); 
     
@@ -67,7 +65,7 @@ while true
     plot3(pathX, pathY, pathZ, 'g-', 'LineWidth', 2);  % Geçmiş yol çizgisi
     drawnow; % Gerçek zamanlı güncelleme
 
-    % pause(0.1); % Küçük bir bekleme süresi ekleyerek animasyonu akıcı hale getir
+    pause(0.1); % Küçük bir bekleme süresi ekleyerek animasyonu akıcı hale getir
 
 end
 
