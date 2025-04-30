@@ -40,10 +40,10 @@ pathY = [-50]; % Başlangıç Y koordinatını diziye ekle
 pathZ = [0];   % Başlangıç Z koordinatını diziye ekle
 
 
-plot3(21, 8, 8, 'ro', 'MarkerSize',3, 'MarkerFaceColor', 'r');
+plot3(42, 33, 4, 'ro', 'MarkerSize',3, 'MarkerFaceColor', 'r');
 hPoint = plot3(-50, -50, 0, 'ro', 'MarkerSize', 3, 'MarkerFaceColor', 'g');
 
-p = pso3D(MAP,[-50,-50,0],[21,8,8]);  
+p = pso3D(MAP,[-50,-50,0],[42,33,4]);  
 p = p.calculatePosition();
 
 while true 
@@ -61,12 +61,11 @@ while true
         pathZ = pathZ(end-N+1:end);
     end
     
-
-        % Noktayı güncelle
-        set(hPoint, 'XData', p.gBestLocation.x, 'YData', p.gBestLocation.y, 'ZData', p.gBestLocation.z);
-        % Yolu çiz (her iterasyonda çizgiyi güncelle)
-        plot3(pathX, pathY, pathZ, 'g-', 'LineWidth', 2);  % Geçmiş yol çizgisi
-        drawnow; % Gerçek zamanlı güncelleme
+    % Noktayı güncelle
+    set(hPoint, 'XData', p.gBestLocation.x, 'YData', p.gBestLocation.y, 'ZData', p.gBestLocation.z);
+    % Yolu çiz (her iterasyonda çizgiyi güncelle)
+    plot3(pathX, pathY, pathZ, 'g-', 'LineWidth', 2);  % Geçmiş yol çizgisi
+    drawnow; % Gerçek zamanlı güncelleme
 
     % pause(0.1); % Küçük bir bekleme süresi ekleyerek animasyonu akıcı hale getir
 

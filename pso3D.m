@@ -4,9 +4,9 @@ classdef pso3D
         w       = 0.7;  % Atalet katsayısı
         c1      = 1.5;  % Bireysel en iyi katsayı
         c2      = 1.5;  % Küresel en iyi katsayı
-        xStep   = 5;    % Ucak X Eksen Hareket Limiti   Parcacik Hiz Limiti
-        yStep   = 5;    % Ucak Y Eksen Hareket Limiti   Parcacik Hiz Limiti
-        zStep   = 4;    % Ucak Z Eksen Hareket Limiti Parcacik Hiz Limiti
+        xStep   = 3;    % Ucak X Eksen Hareket Limiti   Parcacik Hiz Limiti
+        yStep   = 3;    % Ucak Y Eksen Hareket Limiti   Parcacik Hiz Limiti
+        zStep   = 1;    % Ucak Z Eksen Hareket Limiti Parcacik Hiz Limiti
 
 
         startPos = [0, 0, 0];  % Başlangıç Konumu
@@ -21,6 +21,9 @@ classdef pso3D
         gBestLocation;    % Küresel en iyi konum
         gBestScore;       % Küresel en iyi skor
 
+        maxLenght   = 0;
+        maxAltitude = 0;
+
     end
 
     methods
@@ -32,11 +35,14 @@ classdef pso3D
             this.pBestScores = inf(1, this.pNumber);
             this.gBestScore = inf;
 
+            this.maxLenght   = sqrt((this.startPos(1) - this.goalPos(1))^2 + (this.startPos(2) - this.goalPos(2))^2 );
+            this.maxAltitude = sqrt((this.startPos(3) - this.goalPos(3))^2 );
+
             % Parçacıkları başlat
             for i = 1:this.pNumber
-                this.pLocations(i).x = rand * this.xStep + this.MAP.X_MIN_LIMIT;
-                this.pLocations(i).y = rand * this.yStep + this.MAP.Y_MIN_LIMIT;
-                this.pLocations(i).z = rand * this.zStep + this.MAP.Z_MIN_LIMIT;
+                this.pLocations(i).x = rand * this.xStep + this.startPos(1);
+                this.pLocations(i).y = rand * this.yStep + this.startPos(2);
+                this.pLocations(i).z = rand * this.zStep + this.startPos(3);
 
                 this.pSpeeds(i).x = 0;
                 this.pSpeeds(i).y = 0;
@@ -90,11 +96,8 @@ classdef pso3D
 
                 this = this.updatePartical(i);
 
-                if this.checkCollision(this.pLocations(i).x, this.pLocations(i).y, this.pLocations(i).z)
-                    fitness = inf; % Engel varsa cezalandır
-                else
-                    fitness = sqrt((this.pLocations(i).x - this.goalPos(1))^2 + (this.pLocations(i).y - this.goalPos(2))^2 + (this.pLocations(i).z - this.goalPos(3))^2);
-                end
+                fitness = cLength(this,i) + cAltitude(this,i) + 100 * cCollision(this,i);
+
                 % Kendi en iyi konumu güncelle
                 if fitness < this.pBestScores(i)
                     this.pBestLocations(i) = this.pLocations(i);
@@ -113,12 +116,18 @@ classdef pso3D
 
         end
 
-        function collision = checkCollision(this, x, y, z)
-            % (x, y) konumundaki yükseklik değeri
-            mapHeight = interp2(this.MAP.X, this.MAP.Y, this.MAP.Z, x, y, 'linear', max(this.MAP.Z(:)));
+        function out = cLength(this,i)
+            out = sqrt((this.pLocations(i).x - this.goalPos(1))^2 + (this.pLocations(i).y - this.goalPos(2))^2 ) / this.maxLenght;
+        end 
 
-            % Eğer parçacığın yüksekliği harita yüksekliğinden küçükse çakışma var
-            collision = (z <= mapHeight);
+        function out = cAltitude(this,i)
+            out = sqrt((this.pLocations(i).z - this.goalPos(3))^2 ) / this.maxAltitude;
+        end 
+
+        function out = cCollision(this,i)
+            mapHeight = interp2(this.MAP.X, this.MAP.Y, this.MAP.Z, this.pLocations(i).x, this.pLocations(i).y, 'linear', max(this.MAP.Z(:)));
+            out = (this.pLocations(i).z <= mapHeight);
         end
+
     end
 end
