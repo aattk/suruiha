@@ -1,4 +1,4 @@
-classdef pso3D
+classdef pso3D < handle
     properties
         pNumber =  30;  % Parçacık Sayısı
         w       = 0.7;  % Atalet katsayısı
@@ -18,10 +18,22 @@ classdef pso3D
         pBestScores;      % Kendi en iyi skorlar
         gBestLocation;    % Küresel en iyi konum
         gBestScore;       % Küresel en iyi skor
-        
+        lgBestScore = 0;
+
 
         maxLenght   = 0;
         maxAltitude = 0;
+
+        % ORANLAR
+        rateChangeCounter = 0;
+        rateChangeLimit   = 20;
+        rLENGTH           = 1.0;
+        rMinLENGTH        = 0.01;
+        rMaxLENGTH        = 1.0;
+        rALTITUDE         = 0.2;
+        rMinALTITUDE      = 0.01;
+        rMaxALTITUDE      = 1.0;
+        STATUS            = 0;
 
     end
 
@@ -93,7 +105,7 @@ classdef pso3D
 
                 this = this.updatePartical(i);
 
-                fitness = 0.5 * cLength(this,i) + 0.1 * cAltitude(this,i) + 1.0 * cCollision(this,i);
+                fitness = this.rLENGTH * cLength(this,i) + this.rALTITUDE * cAltitude(this,i) + 10 * cCollision(this,i);
 
                 % fitness = constantFitnessStabilizer(this,i);
 
@@ -109,9 +121,11 @@ classdef pso3D
                     this.gBestScore    = fitness;
                 end
 
+                [ this.lgBestScore, this.rLENGTH, this.rALTITUDE ] = this.updateFitnessRatio();
+
             end
 
-            fprintf('GBEST:%f X:%f  Y:%f Z:%f \n', this.gBestScore, this.gBestLocation.x,this.gBestLocation.y,this.gBestLocation.z );
+            fprintf('GBEST:%f X:%f  Y:%f Z:%f rL:%f rA:%f\n', this.gBestScore, this.gBestLocation.x,this.gBestLocation.y,this.gBestLocation.z, this.rLENGTH ,this.rALTITUDE );
 
         end
 
@@ -119,15 +133,15 @@ classdef pso3D
             if ( this.gBestScore == this.pBestScores(i) )
                 out = inf;
             end
-        end 
+        end
 
         function out = cLength(this,i)
             out = sqrt((this.pLocations(i).x - this.goalPos(1))^2 + (this.pLocations(i).y - this.goalPos(2))^2 ) / this.maxLenght;
-        end 
+        end
 
         function out = cAltitude(this,i)
             out = sqrt((this.pLocations(i).z - this.goalPos(3))^2 ) / this.maxAltitude;
-        end 
+        end
 
         function out = cCollision(this,i)
             mapHeight = interp2(this.MAP.X, this.MAP.Y, this.MAP.Z, this.pLocations(i).x, this.pLocations(i).y, 'linear', max(this.MAP.Z(:)));
@@ -135,7 +149,44 @@ classdef pso3D
         end
 
         function out = cArea(this,i)
-            
+
+        end
+
+        function [lastbestScore,ratioLength,ratioAltitude] = updateFitnessRatio(this)
+            if ( this.gBestScore == this.lgBestScore )
+                this.rateChangeCounter = this.rateChangeCounter + 1;
+
+                if ( this.rateChangeLimit <= this.rateChangeCounter )
+                    if ( this.STATUS == 0 )
+                        ratioLength   = min( (this.rLENGTH   + 0.01), this.rMaxLENGTH   );
+                        ratioAltitude = max(this.rALTITUDE   - 0.01, this.rMinALTITUDE );
+                    else
+                        ratioLength   = max( (this.rLENGTH   - 0.01), this.rMinLENGTH   );
+                        ratioAltitude = min(this.rALTITUDE   + 0.01, this.rMaxALTITUDE );
+                    end
+
+                    if ( this.rLENGTH == this.rMaxLENGTH )
+                        this.STATUS = 1;
+                    end
+                    if ( this.rALTITUDE == this.rMaxLENGTH )
+                        this.STATUS = 0;
+                    end
+
+                    this.rateChangeCounter = 0;
+                    lastbestScore = this.lgBestScore;
+                    return
+                end
+
+                ratioLength   = this.rLENGTH ;
+                ratioAltitude = this.rALTITUDE;
+                lastbestScore = this.lgBestScore;
+
+            else
+                this.rateChangeCounter = 0;
+                ratioLength   = this.rLENGTH ;
+                ratioAltitude = this.rALTITUDE;
+                lastbestScore = this.gBestScore;
+            end
         end
 
     end
