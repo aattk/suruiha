@@ -1,6 +1,6 @@
 classdef pso3D
     properties
-        pNumber =  60;  % Parçacık Sayısı
+        pNumber =  30;  % Parçacık Sayısı
         w       = 0.7;  % Atalet katsayısı
         c1      = 1.5;  % Bireysel en iyi katsayı
         c2      = 1.5;  % Küresel en iyi katsayı
@@ -18,6 +18,7 @@ classdef pso3D
         pBestScores;      % Kendi en iyi skorlar
         gBestLocation;    % Küresel en iyi konum
         gBestScore;       % Küresel en iyi skor
+        
 
         maxLenght   = 0;
         maxAltitude = 0;
@@ -84,7 +85,6 @@ classdef pso3D
             this.pLocations(pNum).x = max(min(this.pLocations(pNum).x, this.MAP.X_MAX_LIMIT - this.xStep), this.MAP.X_MIN_LIMIT + this.xStep);
             this.pLocations(pNum).y = max(min(this.pLocations(pNum).y, this.MAP.Y_MAX_LIMIT - this.yStep), this.MAP.Y_MIN_LIMIT + this.xStep);
             this.pLocations(pNum).z = max(min(this.pLocations(pNum).z, this.MAP.Z_MAX_LIMIT - this.zStep), this.MAP.Z_MIN_LIMIT + this.xStep);
-
         end
 
 
@@ -93,7 +93,9 @@ classdef pso3D
 
                 this = this.updatePartical(i);
 
-                fitness = cLength(this,i) + cAltitude(this,i) + 100 * cCollision(this,i);
+                fitness = 0.5 * cLength(this,i) + 0.1 * cAltitude(this,i) + 1.0 * cCollision(this,i);
+
+                % fitness = constantFitnessStabilizer(this,i);
 
                 % Kendi en iyi konumu güncelle
                 if fitness < this.pBestScores(i)
@@ -113,6 +115,12 @@ classdef pso3D
 
         end
 
+        function out = constantFitnessStabilizer(this,i)
+            if ( this.gBestScore == this.pBestScores(i) )
+                out = inf;
+            end
+        end 
+
         function out = cLength(this,i)
             out = sqrt((this.pLocations(i).x - this.goalPos(1))^2 + (this.pLocations(i).y - this.goalPos(2))^2 ) / this.maxLenght;
         end 
@@ -124,6 +132,10 @@ classdef pso3D
         function out = cCollision(this,i)
             mapHeight = interp2(this.MAP.X, this.MAP.Y, this.MAP.Z, this.pLocations(i).x, this.pLocations(i).y, 'linear', max(this.MAP.Z(:)));
             out = (this.pLocations(i).z <= mapHeight);
+        end
+
+        function out = cArea(this,i)
+            
         end
 
     end
